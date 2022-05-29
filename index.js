@@ -8,6 +8,7 @@ require("dotenv").config();
 const productRouter = require("./routes/product.js");
 const authRoutes = require("./routes/user.js");
 const authorized = require("./helper/jwt.js");
+const errorHandler = require("./helper/error.js");
 
 const port = process.env.PORT || 4000;
 const host = process.env.HOST;
@@ -19,14 +20,12 @@ app.use(morgan("tiny"));
 
 app.use(bodyParser.json());
 
-app.use(authorized);
-
 app.use("/public/uploads", express.static(__dirname + "/public/uploads"));
 
-app.use("/product", productRouter);
+app.use("/product", authorized(), productRouter);
 
 app.use("/auth", authRoutes);
-
+app.use(errorHandler);
 mongoose.connect(process.env.DB_KEY, () => {
   app.listen(port, function (err) {
     if (err) {

@@ -30,16 +30,19 @@ router.post("/login", async (req, res) => {
     if (!user) {
       return res.json("user not found");
     }
+    if (password.length < 6) {
+      return res.json("password is too Short ");
+    }
 
     let correctPassword = await bcrypt.compare(password, user.password);
 
     if (!correctPassword) {
-      res.json("password is wrong ");
+      return res.json("password is wrong ");
     }
 
     if (correctPassword && user) {
       const token = jwt.sign(user.id, process.env.JWT_SECRET);
-      res.json({ message: "logged in successfully", token: token });
+      return res.json({ message: "logged in successfully", token: token });
     }
   } catch (err) {
     res.json(err.message);
